@@ -217,3 +217,15 @@ CREATE TABLE `alpide_communication_whatsapp_success` (
     `date_updated` DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
 );
 
+-- `alpide-communication`.bn_email_setting definition
+
+CREATE TABLE `bn_email_setting` (
+  `email_setting_id` bigint NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) DEFAULT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `desc` varchar(255) DEFAULT NULL,
+  `date_created` varchar(255) DEFAULT NULL,
+  `created_by` varchar(255) DEFAULT NULL,
+  `version` int DEFAULT 0,
+  PRIMARY KEY (`email_setting_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
