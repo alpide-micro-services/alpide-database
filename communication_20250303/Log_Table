@@ -1,0 +1,219 @@
+-- `alpide-communication`.sms_master_table definition
+
+CREATE TABLE `sms_master_table` (
+  `sms_master_table_id` bigint NOT NULL AUTO_INCREMENT,
+  `account_sid` varchar(255) DEFAULT NULL,
+  `api_key` varchar(255) DEFAULT NULL,
+  `auth_token` varchar(255) DEFAULT NULL,
+  `callback_url` varchar(255) DEFAULT NULL,
+  `created_by_user_id` bigint DEFAULT NULL,
+  `date_updated` datetime(6) DEFAULT NULL,
+  `from_number` varchar(255) DEFAULT NULL,
+  `is_active` bit(1) DEFAULT NULL,
+  `project_id` varchar(255) DEFAULT NULL,
+  `relationship_id` bigint DEFAULT NULL,
+  `sms_provider` varchar(255) DEFAULT NULL,
+  `updated_by_user_id` bigint DEFAULT NULL,
+  `version` int NOT NULL,
+  PRIMARY KEY (`sms_master_table_id`)
+);
+
+-- `alpide-communication`.email_master_table definition
+
+CREATE TABLE `email_master_table` (
+  `email_master_table_id` bigint NOT NULL AUTO_INCREMENT,
+  `created_by_user_id` bigint DEFAULT NULL,
+  `date_created` datetime(6) DEFAULT NULL,
+  `date_updated` datetime(6) DEFAULT NULL,
+  `email_provider` varchar(255) DEFAULT NULL,
+  `email_provider_host` varchar(255) DEFAULT NULL,
+  `email_provider_port` varchar(255) DEFAULT NULL,
+  `email_provider_username` varchar(255) DEFAULT NULL,
+  `email_receiver` varchar(255) DEFAULT NULL,
+  `email_sender` varchar(255) DEFAULT NULL,
+  `email_sender_password` varchar(255) DEFAULT NULL,
+  `relationship_id` bigint DEFAULT NULL,
+  `updated_by_user_id` bigint DEFAULT NULL,
+  `version` int NOT NULL,
+  PRIMARY KEY (`email_master_table_id`)
+);
+
+-- `alpide-communication`.whatsapp_master_table definition
+
+CREATE TABLE `whatsapp_master_table` (
+  `whatsapp_master_table_id` bigint NOT NULL AUTO_INCREMENT,
+  `account_sid` varchar(255) DEFAULT NULL,
+  `api_key` varchar(255) DEFAULT NULL,
+  `auth_token` varchar(255) DEFAULT NULL,
+  `callback_url` varchar(255) DEFAULT NULL,
+  `created_by_user_id` bigint DEFAULT NULL,
+  `date_updated` datetime(6) DEFAULT NULL,
+  `from_number` varchar(255) DEFAULT NULL,
+  `is_active` bit(1) DEFAULT NULL,
+  `relationship_id` bigint DEFAULT NULL,
+  `updated_by_user_id` bigint DEFAULT NULL,
+  `version` int NOT NULL,
+  `whatsapp_provider` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`whatsapp_master_table_id`)
+);
+
+
+CREATE TABLE `scheduled_email_details` (
+    `scheduled_email_details_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `version` INT NOT NULL,
+    `rid` BIGINT,
+    `provider_name` VARCHAR(255),
+    `provider_type` VARCHAR(255),
+    `subject` VARCHAR(255),
+    `body` VARCHAR(2000),
+    `from` VARCHAR(255),
+    `to` VARCHAR(255),
+    `host` VARCHAR(255),
+    `port` VARCHAR(50),
+    `password` VARCHAR(255),
+    `is_email_sent` INT,
+    `event` VARCHAR(255),
+    `transaction_name` VARCHAR(255),
+    `transaction_data` LONGTEXT,
+    `date_created` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    `date_updated` DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
+    `created_by_user_id` BIGINT,
+    `updated_by_user_id` BIGINT
+);
+
+
+-- `alpide-communication`.scheduled_whatsapp_details definition
+
+CREATE TABLE `scheduled_whatsapp_details` (
+  `is_sms_sent` int DEFAULT NULL,
+  `version` int NOT NULL,
+  `date_created` datetime(6) DEFAULT NULL,
+  `date_updated` datetime(6) DEFAULT NULL,
+  `rid` bigint DEFAULT NULL,
+  `scheduled_sms_details_id` bigint NOT NULL AUTO_INCREMENT,
+  `account_sid` varchar(255) DEFAULT NULL,
+  `api_key` varchar(255) DEFAULT NULL,
+  `auth_token` varchar(255) DEFAULT NULL,
+  `event` varchar(255) DEFAULT NULL,
+  `from_number` varchar(255) DEFAULT NULL,
+  `tag` varchar(255) DEFAULT NULL,
+  `to_number` varchar(255) DEFAULT NULL,
+  `transaction_data` longtext,
+  `transaction_name` varchar(255) DEFAULT NULL,
+  `whatsapp_provider` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`scheduled_sms_details_id`)
+);
+
+
+-- `alpide-communication`.scheduled_sms_details definition
+
+CREATE TABLE `scheduled_sms_details` (
+  `scheduled_sms_details_id` bigint NOT NULL AUTO_INCREMENT,
+  `account_sid` varchar(255) DEFAULT NULL,
+  `api_key` varchar(255) DEFAULT NULL,
+  `auth_token` varchar(255) DEFAULT NULL,
+  `created_by_user_id` bigint DEFAULT NULL,
+  `date_created` datetime(6) DEFAULT NULL,
+  `date_updated` datetime(6) DEFAULT NULL,
+  `event` varchar(255) DEFAULT NULL,
+  `from_number` varchar(255) DEFAULT NULL,
+  `is_sms_sent` int DEFAULT NULL,
+  `rid` bigint DEFAULT NULL,
+  `tag` varchar(255) DEFAULT NULL,
+  `to_number` varchar(255) DEFAULT NULL,
+  `transaction_data` longtext,
+  `transaction_name` varchar(255) DEFAULT NULL,
+  `updated_by_user_id` bigint DEFAULT NULL,
+  `version` int NOT NULL,
+  `whatsapp_provider` varchar(255) DEFAULT NULL,
+  `sms_provider` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`scheduled_sms_details_id`)
+);
+
+CREATE TABLE `alpide_communication_email_failure` (
+    `alpide_communication_email_failure_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `rid` BIGINT,
+    `provider_name` VARCHAR(255),
+    `provider_type` VARCHAR(255),
+    `subject` VARCHAR(255),
+    `body` VARCHAR(2000),
+    `from` VARCHAR(255),
+    `to` VARCHAR(1000),
+    `host` VARCHAR(255),
+    `port` VARCHAR(50),
+    `password` VARCHAR(255),
+    `event` VARCHAR(255),
+    `transaction_name` VARCHAR(255),
+    `transaction_data` LONGTEXT,
+    `date_created` datetime(6) DEFAULT NULL,
+    `date_updated` DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
+);
+
+CREATE TABLE `alpide_communication_email_success` (
+    `alpide_communication_email_success_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `rid` BIGINT,
+    `provider_name` VARCHAR(255),
+    `provider_type` VARCHAR(255),
+    `subject` VARCHAR(255),
+    `body` VARCHAR(2000),
+    `from` VARCHAR(255),
+    `to` VARCHAR(1000),
+    `host` VARCHAR(255),
+    `port` VARCHAR(50),
+    `password` VARCHAR(255),
+    `event` VARCHAR(255),
+    `transaction_name` VARCHAR(255),
+    `transaction_data` LONGTEXT,
+    `date_created` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6)
+    `date_updated` DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
+);
+
+CREATE TABLE `alpide_communication_sms_failure` (
+    `alpide_communication_message_failure_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `rid` BIGINT,
+    `header` VARCHAR(255),
+    `body` VARCHAR(2000),
+    `from` VARCHAR(255),
+    `to` VARCHAR(255),
+    `transaction_data` LONGTEXT,
+    `date_created` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    `date_updated` DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
+);
+
+
+CREATE TABLE `alpide_communication_sms_success` (
+    `alpide_communication_sms_success_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `rid` BIGINT,
+    `subject` VARCHAR(255),
+    `body` VARCHAR(2000),
+    `from` VARCHAR(255),
+    `to` VARCHAR(255),
+    `transaction_data` LONGTEXT,
+    `date_created` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    `date_updated` DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
+);
+
+CREATE TABLE `alpide_communication_whatsapp_failure` (
+    `alpide_communication_whatsapp_failure_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `rid` BIGINT,
+    `subject` VARCHAR(255),
+    `body` VARCHAR(2000),
+    `from` VARCHAR(255),
+    `to` VARCHAR(255),
+    `transaction_data` LONGTEXT,
+    `date_created` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    `date_updated` DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
+);
+
+CREATE TABLE `alpide_communication_whatsapp_success` (
+    `alpide_communication_whatsap_success_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+    `rid` BIGINT,
+    `subject` VARCHAR(255),
+    `body` VARCHAR(2000),
+    `from` VARCHAR(255),
+    `to` VARCHAR(255),
+    `transaction_data` LONGTEXT,
+    `date_created` DATETIME(6) DEFAULT CURRENT_TIMESTAMP(6),
+    `date_updated` DATETIME(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
+);
+
