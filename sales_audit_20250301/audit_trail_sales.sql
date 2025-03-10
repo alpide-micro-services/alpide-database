@@ -1,15 +1,40 @@
 CREATE TABLE `alpide-sales`.audit_trail_sales (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    version_number INT NOT NULL,
     entity_name VARCHAR(255) NOT NULL,
-    entity_id VARCHAR(100) NOT NULL,
-    event_type VARCHAR(50) NOT NULL,
-    changed_column VARCHAR(100) NOT NULL,
-    old_value TEXT,
-    new_value TEXT,
-    event_timestamp DATETIME NOT NULL,
-    updated_by VARCHAR(100),
-    created_by VARCHAR(100)
+    entity_id VARCHAR(255) NOT NULL,
+    event_type VARCHAR(255) NOT NULL,
+    transaction_data LONGTEXT,
+    event_timestamp DATETIME(6) NOT NULL,
+    updated_by BIGINT,
+    created_by BIGINT
 );
+
+
+CREATE TABLE `alpide-purchase`.audit_trail_purchase (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    version_number INT NOT NULL,
+    entity_name VARCHAR(255) NOT NULL,
+    entity_id VARCHAR(255) NOT NULL,
+    event_type VARCHAR(255) NOT NULL,
+    transaction_data LONGTEXT,
+    event_timestamp DATETIME(6) NOT NULL,
+    updated_by BIGINT,
+    created_by BIGINT
+);
+
+CREATE TABLE `alpide-inventory`.audit_trail_inventory (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    version_number INT NOT NULL,
+    entity_name VARCHAR(255) NOT NULL,
+    entity_id VARCHAR(255) NOT NULL,
+    event_type VARCHAR(255) NOT NULL,
+    transaction_data LONGTEXT,
+    event_timestamp DATETIME(6) NOT NULL,
+    updated_by BIGINT,
+    created_by BIGINT
+);
+
 
 -- `alpide-sales`.alpide_sequence definition
 
