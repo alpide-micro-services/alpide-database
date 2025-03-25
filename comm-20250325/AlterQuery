@@ -1,0 +1,13 @@
+ALTER TABLE `alpide-communication`.alpide_communication_email_failure 
+ADD COLUMN entity_id BIGINT,
+ADD COLUMN customer_id BIGINT,
+ADD COLUMN supplier_id BIGINT,
+ADD COLUMN customer_name VARCHAR(255),
+ADD COLUMN transaction_number VARCHAR(255);
+
+ALTER TABLE `alpide-communication`.alpide_communication_email_success 
+ADD COLUMN entity_id BIGINT,
+ADD COLUMN customer_id BIGINT,
+ADD COLUMN supplier_id BIGINT,
+ADD COLUMN customer_name VARCHAR(255),
+ADD COLUMN transaction_number VARCHAR(255);
