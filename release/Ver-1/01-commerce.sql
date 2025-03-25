@@ -256,3 +256,4 @@ END$$
 DELIMITER ;
 ;
 
+ALTER TABLE `alpide-crm`.`org_registration_form_setting` MODIFY COLUMN form_setting TEXT default null;
