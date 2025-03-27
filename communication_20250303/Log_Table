@@ -130,67 +130,59 @@
     PRIMARY KEY (`scheduled_sms_details_id`)
     );
 
-    CREATE TABLE `alpide-communication`.`alpide_communication_email_failure` (
-        `alpide_communication_email_failure_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-        `rid` BIGINT,
-        `provider_name` VARCHAR(255),
-        `provider_type` VARCHAR(255),
-        `subject` VARCHAR(255),
-        `body` VARCHAR(2000),
-        `from` VARCHAR(255),
-        `to` VARCHAR(1000),
-        `host` VARCHAR(255),
-        `port` VARCHAR(50),
-        `password` VARCHAR(255),
-        `event` VARCHAR(255),
-        `transaction_name` VARCHAR(255),
-        `transaction_data` LONGTEXT,
-        `date_created` datetime(6) DEFAULT NULL,
-        `date_updated` datetime(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
-    );
-
-    
-
-    CREATE TABLE `alpide-communication`.`alpide_communication_email_success` (
-        `alpide_communication_email_success_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-        `rid` BIGINT,
-        `provider_name` VARCHAR(255),
-        `provider_type` VARCHAR(255),
-        `subject` VARCHAR(255),
-        `body` VARCHAR(2000),
-        `from` VARCHAR(255),
-        `to` VARCHAR(1000),
-        `host` VARCHAR(255),
-        `port` VARCHAR(50),
-        `password` VARCHAR(255),
-        `event` VARCHAR(255),
-        `transaction_name` VARCHAR(255),
-        `transaction_data` LONGTEXT,
-        `date_created` datetime(6) DEFAULT NULL,
-        `date_updated` datetime(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
-    );
-
-        -- alpide.alpide_communication_email_failure definition
-
-CREATE TABLE `alpide-communication`.`alpide_communication_email_failure` (
+  CREATE TABLE `alpide_communication_email_failure` (
   `alpide_communication_email_failure_id` bigint NOT NULL AUTO_INCREMENT,
   `rid` bigint DEFAULT NULL,
   `provider_name` varchar(255) DEFAULT NULL,
   `provider_type` varchar(255) DEFAULT NULL,
   `subject` varchar(255) DEFAULT NULL,
   `body` varchar(2000) DEFAULT NULL,
-  `from` varchar(255) DEFAULT NULL,
-  `to` varchar(1000) DEFAULT NULL,
-  `host` varchar(255) DEFAULT NULL,
-  `port` varchar(50) DEFAULT NULL,
-  `password` varchar(255) DEFAULT NULL,
   `event` varchar(255) DEFAULT NULL,
   `transaction_name` varchar(255) DEFAULT NULL,
   `transaction_data` longtext,
-  `date_created` datetime(6) DEFAULT NULL,
-  `date_updated` datetime(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
+  `date_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_updated` timestamp NULL DEFAULT NULL,
+  `customer_id` bigint DEFAULT NULL,
+  `customer_name` varchar(255) DEFAULT NULL,
+  `entity_id` bigint DEFAULT NULL,
+  `from_email` varchar(255) DEFAULT NULL,
+  `smtp_host` varchar(255) DEFAULT NULL,
+  `smtp_password` varchar(255) DEFAULT NULL,
+  `smtp_port` varchar(255) DEFAULT NULL,
+  `supplier_id` bigint DEFAULT NULL,
+  `to_email` varchar(255) DEFAULT NULL,
+  `transaction_number` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`alpide_communication_email_failure_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+);
+
+    
+
+ CREATE TABLE `alpide_communication_email_success` (
+  `alpide_communication_email_success_id` bigint NOT NULL AUTO_INCREMENT,
+  `rid` bigint DEFAULT NULL,
+  `provider_name` varchar(255) DEFAULT NULL,
+  `provider_type` varchar(255) DEFAULT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `body` varchar(2000) DEFAULT NULL,
+  `event` varchar(255) DEFAULT NULL,
+  `transaction_name` varchar(255) DEFAULT NULL,
+  `transaction_data` longtext,
+  `date_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_updated` timestamp NULL DEFAULT NULL,
+  `from_email` varchar(255) DEFAULT NULL,
+  `smtp_host` varchar(255) DEFAULT NULL,
+  `smtp_password` varchar(255) DEFAULT NULL,
+  `smtp_port` varchar(255) DEFAULT NULL,
+  `to_email` varchar(255) DEFAULT NULL,
+  `customer_id` bigint DEFAULT NULL,
+  `customer_name` varchar(255) DEFAULT NULL,
+  `entity_id` bigint DEFAULT NULL,
+  `supplier_id` bigint DEFAULT NULL,
+  `transaction_number` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`alpide_communication_email_success_id`)
+);
+
+    
 
     CREATE TABLE `alpide-communication`.`alpide_communication_sms_failure` (
         `alpide_communication_message_failure_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -205,17 +197,23 @@ CREATE TABLE `alpide-communication`.`alpide_communication_email_failure` (
     );
 
 
-    CREATE TABLE `alpide-communication`.`alpide_communication_sms_success` (
-        `alpide_communication_sms_success_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
-        `rid` BIGINT,
-        `subject` VARCHAR(255),
-        `body` VARCHAR(2000),
-        `from` VARCHAR(255),
-        `to` VARCHAR(255),
-        `transaction_data` LONGTEXT,
-        `date_created` datetime(6) DEFAULT NULL,
-        `date_updated` datetime(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
-    );
+   CREATE TABLE `alpide_communication_sms_failure` (
+  `alpide_communication_message_failure_id` bigint NOT NULL AUTO_INCREMENT,
+  `rid` bigint DEFAULT NULL,
+  `header` varchar(255) DEFAULT NULL,
+  `transaction_data` longtext,
+  `date_created` datetime(6) DEFAULT NULL,
+  `date_updated` datetime(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6),
+  `api_key` varchar(255) DEFAULT NULL,
+  `error_description` varchar(255) DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `sender_id` varchar(255) DEFAULT NULL,
+  `to_mobile` varchar(255) DEFAULT NULL,
+  `provider_name` varchar(255) DEFAULT NULL,
+  `event` varchar(255) DEFAULT NULL,
+  `transaction_name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`alpide_communication_message_failure_id`)
+);
 
     CREATE TABLE `alpide-communication`.`alpide_communication_whatsapp_failure` (
         `alpide_communication_whatsapp_failure_id` BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -240,6 +238,22 @@ CREATE TABLE `alpide-communication`.`alpide_communication_email_failure` (
         `date_created` datetime(6) DEFAULT NULL,
         `date_updated` datetime(6) DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP(6)
     );
+    
+    CREATE TABLE `alpide_communication_sms_success` (
+  `alpide_communication_sms_success_id` bigint NOT NULL AUTO_INCREMENT,
+  `rid` bigint DEFAULT NULL,
+  `transaction_data` longtext,
+  `date_created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `date_updated` timestamp NULL DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `sender_id` varchar(255) DEFAULT NULL,
+  `to_mobile` varchar(255) DEFAULT NULL,
+  `provider_name` varchar(255) DEFAULT NULL,
+  `api_key` varchar(255) DEFAULT NULL,
+  `transaction_name` varchar(255) DEFAULT NULL,
+  `event` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`alpide_communication_sms_success_id`)
+);
 
     -- `alpide-communication`.bn_email_setting definition
 
