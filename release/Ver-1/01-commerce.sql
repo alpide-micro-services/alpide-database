@@ -259,3 +259,18 @@ DELIMITER ;
 ALTER TABLE `alpide-crm`.`crm_lead_form_setting` MODIFY COLUMN form_fields_setting TEXT default null;
 
 ALTER TABLE `alpide-inventory`.`inventory_item` ADD COLUMN product_additional_info TEXT;
+ALTER TABLE `alpide-crm`.`crm_lead_form_setting` ADD COLUMN form_type VARCHAR(100) DEFAULT NULL;
+ALTER TABLE `alpide-crm`.`crm_lead_form_setting` ADD COLUMN  is_two_column_layout VARCHAR(100) DEFAULT NULL;
+
+CREATE TABLE `alpide-crm`.crm_lead_form_response (
+    crm_lead_form_response_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    crm_lead_form_setting_id BIGINT DEFAULT null,
+    rid BIGINT DEFAULT null,
+    form_name VARCHAR(255) DEFAULT null,
+    form_fields_response TEXT,
+    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    date_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    form_short_description VARCHAR(512) DEFAULT null,
+    form_type VARCHAR(100) DEFAULT null,
+    is_two_column_layout VARCHAR(10) DEFAULT 'false'
+);
