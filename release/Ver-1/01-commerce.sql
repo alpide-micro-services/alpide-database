@@ -274,3 +274,5 @@ CREATE TABLE `alpide-crm`.crm_lead_form_response (
     form_type VARCHAR(100) DEFAULT null,
     is_two_column_layout VARCHAR(10) DEFAULT 'false'
 );
+
+ALTER TABLE `alpide-commerce`.`ecom_setting` ADD COLUMN cart_prefrence text DEFAULT NULL;
