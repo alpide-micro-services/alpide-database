@@ -1,3 +1,41 @@
 ALTER TABLE `alpide-inventory`.wms_packing_unit
 ADD COLUMN weight_unit VARCHAR(255),
 ADD COLUMN dimension_unit VARCHAR(255);
+
+ALTER TABLE `alpide-inventory`.wms_storage_bin
+ADD COLUMN is_barcode_genrated BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE `alpide-purchase`.supplier_inbound_delivery_details
+ADD COLUMN batch_id BIGINT DEFAULT 0,
+ADD COLUMN batch_number VARCHAR(255) DEFAULT NULL;
+
+
+CREATE TABLE `supplier_inbound_delivery_packing_unit_ref` (
+  `packing_unit_ref_id` bigint NOT NULL AUTO_INCREMENT,
+  `date_created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `dimension` varchar(255) DEFAULT NULL,
+  `inbound_delivery_details_id` bigint DEFAULT NULL,
+  `inbound_delivery_master_id` bigint DEFAULT NULL,
+  `inbound_delivery_number` varchar(255) DEFAULT NULL,
+  `last_updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `package_name` varchar(255) DEFAULT NULL,
+  `package_unit_id` double DEFAULT NULL,
+  `quantity` double DEFAULT NULL,
+  `rid` bigint DEFAULT NULL,
+  `supplier_id` bigint DEFAULT NULL,
+  `uom_name` varchar(255) DEFAULT NULL,
+  `weight` double DEFAULT NULL,
+  PRIMARY KEY (`packing_unit_ref_id`)
+);
+
+CREATE TABLE `alpide-purchase`.packing_unit_putaway_ref (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    storage_bin_id BIGINT NOT NULL,
+    relationship_id BIGINT NOT NULL,
+    storage_type_id BIGINT DEFAULT NULL,
+    quantity INT DEFAULT '0',
+    package_unit_id BIGINT DEFAULT NULL,
+    packing_unit_ref_id BIGINT NOT NULL,
+    date_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
