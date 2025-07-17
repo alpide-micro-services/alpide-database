@@ -175,6 +175,17 @@ ALTER TABLE `alpide-accounting`.finance_gst_goods_rates MODIFY COLUMN version in
 ALTER TABLE `alpide-accounting`.finance_gst_goods_rates MODIFY COLUMN description_of_goods LONGTEXT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL;
 
 -- US Ledger book Setup start
+ALTER TABLE `alpide-accounting`.`coa_category_group`
+    ADD COLUMN `country_id` BIGINT NULL DEFAULT '0';
+
+ALTER TABLE `alpide-accounting`.`coa_category`
+    ADD COLUMN `country_id` BIGINT NULL DEFAULT '0';
+
+ALTER TABLE `alpide-accounting`.`coa_ledger_account_group`
+    ADD COLUMN `country_id` BIGINT NULL DEFAULT '0';
+
+ALTER TABLE `alpide-accounting`.`coa_ledger_account`
+    ADD COLUMN `country_id` BIGINT NULL DEFAULT '0';
 
 
 ALTER TABLE `alpide-accounting`.coa_category_group MODIFY COLUMN version int DEFAULT 0 NOT NULL;
