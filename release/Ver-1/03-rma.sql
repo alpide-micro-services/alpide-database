@@ -27,4 +27,4 @@ ALTER TABLE `alpide-purchase`.`supplier_inbound_delivery_master` ADD COLUMN amen
 
 
 
-ALTER TABLE `alpide-purchase`.`tx_conversion_po_to_id_ref` ADD COLUMN amend_sales_order_master_id BIGINT DEFAULT NULL;
+ALTER TABLE `alpide-purchase`.`tx_conversion_po_to_id_ref` ADD COLUMN amend_sales_order_master_id BIGINT DEFAULT NULL; 

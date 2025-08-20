@@ -1,0 +1,1 @@
+ALTER TABLE `alpide-inventory`.`inventory_item` ADD COLUMN customer_sku VARCHAR(200) DEFAULT NULL;
