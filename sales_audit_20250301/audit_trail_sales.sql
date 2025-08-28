@@ -46,7 +46,7 @@ CREATE TABLE `alpide-inventory`.audit_trail_inventory (
 
 -- `alpide-sales`.alpide_sequence definition
 
-CREATE TABLE `alpide_sequence` (
+CREATE TABLE `alpide-sales`.`alpide_sequence` (
   `version` int NOT NULL,
   `alpide_sequence_id` bigint NOT NULL AUTO_INCREMENT,
   `rid` bigint DEFAULT NULL,
