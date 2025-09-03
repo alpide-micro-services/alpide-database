@@ -1,0 +1,15 @@
+CREATE TABLE `alpide-users`.`common_stamp_setting` (
+                                                       `common_stamp_setting_id` BIGINT NOT NULL AUTO_INCREMENT,
+                                                       `rid`          BIGINT NOT NULL,
+                                                       `doc_name`                 VARCHAR(255) NOT NULL,
+                                                       `aws_object_key`           VARCHAR(512) NOT NULL,
+                                                       `bucket_name`              VARCHAR(255) NOT NULL,
+                                                       `folder_name`              VARCHAR(255) DEFAULT NULL,
+                                                       `content_type`             VARCHAR(255) DEFAULT NULL,
+                                                       `content_length`           BIGINT DEFAULT NULL,
+                                                       `original_filename`        VARCHAR(255) DEFAULT NULL,
+                                                       `file_size`                     BIGINT DEFAULT NULL,
+                                                       `doc_type`                 VARCHAR(128) DEFAULT NULL,
+                                                       `date_updated`             TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                                       `date_created`             TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+                                                       PRIMARY KEY (`common_stamp_setting_id`));

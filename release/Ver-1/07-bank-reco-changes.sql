@@ -58,3 +58,9 @@ ALTER TABLE `alpide-accounting`.`relationship_expense_payment`
 
 ALTER TABLE `alpide-accounting`.`journals_entry_master`
     ADD COLUMN bank_detail_id BIGINT DEFAULT '0';
+
+ALTER TABLE `alpide-accounting`.`journal_tx`
+    CHANGE COLUMN `journal_id` `journals_entry_master_id` BIGINT NULL DEFAULT NULL ;
+
+ALTER TABLE `alpide-accounting`.`journal_tx`
+    ADD COLUMN `journal_id` BIGINT NULL DEFAULT '0' AFTER `version`;
