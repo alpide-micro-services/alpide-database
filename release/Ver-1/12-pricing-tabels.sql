@@ -34,3 +34,12 @@ ALTER TABLE `alpide-inventory`.`inventory_item` ADD COLUMN is_fragile  int DEFAU
 ALTER TABLE `alpide-inventory`.`inventory_item` ADD COLUMN is_hazardous_material  int DEFAULT 0;
 
 ALTER TABLE `alpide-inventory`.`inventory_item` ADD COLUMN country_of_origin  varchar(255) DEFAULT null;
+
+
+CREATE TABLE `alpide-purchase`.`supplier_exchande_rate` (
+    supplier_exchande_rate_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    supplier_id BIGINT  DEFAULT null,
+    rid BIGINT  DEFAULT null,
+    exchange_rate DOUBLE  DEFAULT 0.0,
+    currency_code VARCHAR(10)  DEFAULT null
+);
