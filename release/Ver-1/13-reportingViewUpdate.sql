@@ -150,7 +150,6 @@ VIEW `alpide-sales`.`sales_details_report_with_attri_vw` AS
 USE `alpide-sales`;
 CREATE  OR REPLACE 
     ALGORITHM = UNDEFINED 
-    DEFINER = `root`@`localhost` 
     SQL SECURITY DEFINER
 VIEW `alpide-sales`.`invoice_sales_report_vw` AS
     SELECT 
