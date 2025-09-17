@@ -63,3 +63,7 @@ LEFT JOIN `alpide-inventory`.inventory_item_variant v
 WHERE inv.status IS NOT NULL
   AND LOWER(inv.status) <> 'void'      
 GROUP BY invdet.rid, YEAR(inv.invoice_date), MONTHNAME(inv.invoice_date), itm.sku, itm.ean, v.attribute_name1, v.attribute_name2, v.attribute_name3, invdet.attribute_name1, invdet.attribute_name2, invdet.attribute_name3;
+
+
+
+ALTER TABLE `alpide-purchase`.`supplier_po_master` ADD COLUMN is_consignment_order int DEFAULT 0;
