@@ -67,3 +67,54 @@ GROUP BY invdet.rid, YEAR(inv.invoice_date), MONTHNAME(inv.invoice_date), itm.sk
 
 
 ALTER TABLE `alpide-purchase`.`supplier_po_master` ADD COLUMN is_consignment_order int DEFAULT 0;
+
+
+USE `alpide-purchase`;
+CREATE  OR REPLACE 
+    ALGORITHM = UNDEFINED 
+   
+    SQL SECURITY DEFINER
+VIEW `alpide-purchase`.`grn_report_vm` AS
+    SELECT 
+        CONCAT(CONVERT( COALESCE(`base`.`inbound_delivery_number`, 'NA') USING UTF8MB3),
+                '_',
+                COALESCE(`base`.`sku`, 'NA')) AS `id`,
+        `base`.`rid` AS `rid`,
+        `base`.`year` AS `year`, 
+        `base`.`month` AS `month`,
+        `base`.`sku` AS `sku`,
+        `base`.`ean` AS `ean`,
+        `base`.`brand` AS `brand`,
+        GROUP_CONCAT(DISTINCT IFNULL(`cat`.`category_name`, '')
+            ORDER BY `cat`.`category_name` ASC
+            SEPARATOR '_') AS `category`,
+        `base`.`description` AS `description`,
+        `base`.`qty_received` AS `qty_received`,
+        `base`.`inbound_delivery_number` AS `inbound_delivery_number`
+    FROM
+        (((SELECT 
+            `sm`.`rid` AS `rid`,
+                YEAR(`sm`.`inbound_delivery_date`) AS `year`,
+                MONTHNAME(`sm`.`inbound_delivery_date`) AS `month`,
+                `iv`.`sku` AS `sku`,
+                `itm`.`ean` AS `ean`,
+                `br`.`brand_name` AS `brand`,
+                `itm`.`description` AS `description`,
+                COALESCE(SUM(`sd`.`qty_received`), 0) AS `qty_received`,
+                `sm`.`inbound_delivery_number` AS `inbound_delivery_number`
+        FROM
+            ((((`alpide-purchase`.`supplier_inbound_delivery_master` `sm`
+        JOIN `alpide-purchase`.`supplier_inbound_delivery_details` `sd` ON ((`sm`.`inbound_delivery_master_id` = `sd`.`inbound_delivery_master_id`)))
+        JOIN `alpide-inventory`.`inventory_item_variant` `iv` ON ((`sd`.`item_variant_id` = `iv`.`inventory_item_variant_id`)))
+        JOIN `alpide-inventory`.`inventory_item` `itm` ON ((`iv`.`item_id` = `itm`.`item_id`)))
+        LEFT JOIN `alpide-inventory`.`inventory_item_brand` `br` ON ((`itm`.`brand_id` = `br`.`inventory_item_brand_id`)))
+        GROUP BY `sm`.`rid` , YEAR(`sm`.`inbound_delivery_date`) , MONTHNAME(`sm`.`inbound_delivery_date`) , `iv`.`sku` , `itm`.`ean` , `br`.`brand_name` , `itm`.`description` , `sm`.`inbound_delivery_number`) `base`
+        LEFT JOIN `alpide-inventory`.`inventory_item_category_ref` `catref` ON ((`base`.`sku` = (SELECT 
+                `iv2`.`sku`
+            FROM
+                `alpide-inventory`.`inventory_item_variant` `iv2`
+            WHERE
+                (`iv2`.`item_id` = `catref`.`item_id`)
+            LIMIT 1))))
+        LEFT JOIN `alpide-inventory`.`inventory_item_category` `cat` ON ((`cat`.`inventory_item_category_id` = `catref`.`inventory_item_category_id`)))
+    GROUP BY `base`.`inbound_delivery_number` , `base`.`sku` , `base`.`rid` , `base`.`year` , `base`.`month` , `base`.`ean` , `base`.`brand` , `base`.`description` , `base`.`qty_received`;
