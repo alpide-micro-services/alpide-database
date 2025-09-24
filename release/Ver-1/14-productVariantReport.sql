@@ -118,3 +118,93 @@ VIEW `alpide-purchase`.`grn_report_vm` AS
             LIMIT 1))))
         LEFT JOIN `alpide-inventory`.`inventory_item_category` `cat` ON ((`cat`.`inventory_item_category_id` = `catref`.`inventory_item_category_id`)))
     GROUP BY `base`.`inbound_delivery_number` , `base`.`sku` , `base`.`rid` , `base`.`year` , `base`.`month` , `base`.`ean` , `base`.`brand` , `base`.`description` , `base`.`qty_received`;
+
+
+USE `alpide-sales`;
+CREATE  OR REPLACE 
+    ALGORITHM = UNDEFINED 
+    DEFINER = `root`@`localhost` 
+    SQL SECURITY DEFINER
+VIEW `alpide-sales`.`sales_vs_purchase_report_vw` AS
+    SELECT 
+        CONCAT(`c`.`rid`,
+                '_', 
+                `c`.`year`,
+                '_',
+                `c`.`month_num`,
+                '_',
+                COALESCE(`c`.`sku`, 'UNKNOWN')) AS `id`,
+        `c`.`rid` AS `rid`,
+        `c`.`year` AS `year`,
+        `c`.`month` AS `month`,
+        `c`.`month_num` AS `month_num`,
+        `c`.`sku` AS `sku`,
+        `c`.`ean` AS `ean`,
+        `c`.`brand` AS `brand`,
+        `c`.`category` AS `category`,
+        `c`.`description` AS `description`,
+        SUM(`c`.`purchase_qty`) AS `purchase_qty`,
+        SUM(`c`.`sold_qty`) AS `sold_qty`,
+        (SUM(`c`.`purchase_qty`) - SUM(`c`.`sold_qty`)) AS `remaining_qty`
+    FROM
+        (SELECT 
+            `supdet`.`rid` AS `rid`,
+                YEAR(`supm`.`invoice_date`) AS `year`,
+                MONTHNAME(`supm`.`invoice_date`) AS `month`,
+                MONTH(`supm`.`invoice_date`) AS `month_num`,
+                `itm`.`sku` AS `sku`,
+                `itm`.`ean` AS `ean`,
+                `br`.`brand_name` AS `brand`,
+                COALESCE(`cat_info`.`category`, '') AS `category`,
+                `itm`.`description` AS `description`,
+                SUM(`supdet`.`quantity`) AS `purchase_qty`,
+                0 AS `sold_qty`
+        FROM
+            ((((`alpide-purchase`.`supplier_invoice_details` `supdet`
+        JOIN `alpide-purchase`.`supplier_invoice_master` `supm` ON (((`supdet`.`invoice_master_id` = `supm`.`invoice_master_id`)
+            AND (`supdet`.`rid` = `supm`.`rid`))))
+        JOIN `alpide-inventory`.`inventory_item` `itm` ON ((`supdet`.`item_id` = `itm`.`item_id`)))
+        LEFT JOIN `alpide-inventory`.`inventory_item_brand` `br` ON ((`itm`.`brand_id` = `br`.`inventory_item_brand_id`)))
+        LEFT JOIN (SELECT 
+            `cref`.`item_id` AS `item_id`,
+                GROUP_CONCAT(DISTINCT `cat`.`category_name`
+                    ORDER BY `cat`.`category_name` ASC
+                    SEPARATOR '_') AS `category`
+        FROM
+            (`alpide-inventory`.`inventory_item_category_ref` `cref`
+        JOIN `alpide-inventory`.`inventory_item_category` `cat` ON ((`cref`.`inventory_item_category_id` = `cat`.`inventory_item_category_id`)))
+        GROUP BY `cref`.`item_id`) `cat_info` ON ((`itm`.`item_id` = `cat_info`.`item_id`)))
+        WHERE
+            (LOWER(`supm`.`status`) <> 'void')
+        GROUP BY `supdet`.`rid` , `year` , `month` , `month_num` , `itm`.`sku` , `itm`.`ean` , `br`.`brand_name` , `itm`.`description` , `cat_info`.`category` UNION ALL SELECT 
+            `invdet`.`rid` AS `rid`,
+                YEAR(`invm`.`invoice_date`) AS `year`,
+                MONTHNAME(`invm`.`invoice_date`) AS `month`,
+                MONTH(`invm`.`invoice_date`) AS `month_num`,
+                `itm`.`sku` AS `sku`,
+                `itm`.`ean` AS `ean`,
+                `br`.`brand_name` AS `brand`,
+                COALESCE(`cat_info`.`category`, '') AS `category`,
+                `itm`.`description` AS `description`,
+                0 AS `purchase_qty`,
+                SUM(`invdet`.`quantity`) AS `sold_qty`
+        FROM
+            ((((`alpide-sales`.`customer_invoice_details` `invdet`
+        JOIN `alpide-sales`.`customer_invoice_master` `invm` ON (((`invdet`.`invoice_master_id` = `invm`.`invoice_master_id`)
+            AND (`invdet`.`rid` = `invm`.`rid`))))
+        JOIN `alpide-inventory`.`inventory_item` `itm` ON ((`invdet`.`item_id` = `itm`.`item_id`)))
+        LEFT JOIN `alpide-inventory`.`inventory_item_brand` `br` ON ((`itm`.`brand_id` = `br`.`inventory_item_brand_id`)))
+        LEFT JOIN (SELECT 
+            `cref`.`item_id` AS `item_id`,
+                GROUP_CONCAT(DISTINCT `cat`.`category_name`
+                    ORDER BY `cat`.`category_name` ASC
+                    SEPARATOR '_') AS `category`
+        FROM
+            (`alpide-inventory`.`inventory_item_category_ref` `cref`
+        JOIN `alpide-inventory`.`inventory_item_category` `cat` ON ((`cref`.`inventory_item_category_id` = `cat`.`inventory_item_category_id`)))
+        GROUP BY `cref`.`item_id`) `cat_info` ON ((`itm`.`item_id` = `cat_info`.`item_id`)))
+        WHERE
+            (LOWER(`invm`.`status`) <> 'void')
+        GROUP BY `invdet`.`rid` , `year` , `month` , `month_num` , `itm`.`sku` , `itm`.`ean` , `br`.`brand_name` , `itm`.`description` , `cat_info`.`category`) `c`
+    GROUP BY `c`.`rid` , `c`.`year` , `c`.`month` , `c`.`month_num` , `c`.`sku` , `c`.`ean` , `c`.`brand` , `c`.`category` , `c`.`description`
+    ORDER BY `c`.`rid` , `c`.`year` , `c`.`month_num` , `c`.`sku`;
