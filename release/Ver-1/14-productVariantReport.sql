@@ -208,3 +208,78 @@ VIEW `alpide-sales`.`sales_vs_purchase_report_vw` AS
         GROUP BY `invdet`.`rid` , `year` , `month` , `month_num` , `itm`.`sku` , `itm`.`ean` , `br`.`brand_name` , `itm`.`description` , `cat_info`.`category`) `c`
     GROUP BY `c`.`rid` , `c`.`year` , `c`.`month` , `c`.`month_num` , `c`.`sku` , `c`.`ean` , `c`.`brand` , `c`.`category` , `c`.`description`
     ORDER BY `c`.`rid` , `c`.`year` , `c`.`month_num` , `c`.`sku`;
+USE `alpide-sales`;
+CREATE  OR REPLACE 
+    ALGORITHM = UNDEFINED 
+    SQL SECURITY DEFINER
+VIEW `alpide-sales`.`invoice_sales_report_vw` AS
+    SELECT 
+        MIN(`base`.`id`) AS `id`,
+        `base`.`rid` AS `rid`,
+        `base`.`year` AS `year`, 
+        `base`.`month` AS `month`,
+        `base`.`sku` AS `sku`,
+        `base`.`ean` AS `ean`,
+        `base`.`brand` AS `brand`,
+        COALESCE(`cat_info`.`category`, '') AS `category`,
+        MAX(`base`.`description`) AS `description`,
+        MAX(`base`.`invoice_number`) AS `invoice_number`,
+        SUM(`base`.`qty`) AS `qty`,
+        SUM(`base`.`value`) AS `value`,
+        MAX(`base`.`customer_name`) AS `customer_name`,
+        MAX(`base`.`location`) AS `location`,
+        COALESCE(`base`.`street_address1`, '') AS `street_address1`,
+        MAX(`base`.`state`) AS `state`
+    FROM
+        ((SELECT 
+            `invdet`.`invoice_details_id` AS `id`,
+                `invdet`.`rid` AS `rid`,
+                YEAR(`inv`.`invoice_date`) AS `year`,
+                MONTHNAME(`inv`.`invoice_date`) AS `month`,
+                `itm`.`sku` AS `sku`,
+                `itm`.`ean` AS `ean`,
+                `br`.`brand_name` AS `brand`,
+                `itm`.`description` AS `description`,
+                `inv`.`invoice_number` AS `invoice_number`,
+                `invdet`.`quantity` AS `qty`,
+                (`invdet`.`quantity` * `invdet`.`item_sale_price`) AS `value`,
+                `c`.`company_name` AS `customer_name`,
+                `loc_info`.`location` AS `location`,
+                `loc_info`.`street_address1` AS `street_address1`,
+                `loc_info`.`state` AS `state`
+        FROM
+            (((((`alpide-sales`.`customer_invoice_details` `invdet`
+        JOIN `alpide-sales`.`customer_invoice_master` `inv` ON ((`invdet`.`invoice_master_id` = `inv`.`invoice_master_id`)))
+        JOIN `alpide-inventory`.`inventory_item` `itm` ON ((`invdet`.`item_id` = `itm`.`item_id`)))
+        LEFT JOIN `alpide-inventory`.`inventory_item_brand` `br` ON ((`itm`.`brand_id` = `br`.`inventory_item_brand_id`)))
+        LEFT JOIN `alpide-sales`.`customers` `c` ON ((`inv`.`customer_id` = `c`.`customer_id`)))
+        LEFT JOIN (SELECT 
+            `bl`.`invoice_master_id` AS `invoice_master_id`,
+                `bl`.`rid` AS `rid`,
+                COALESCE(MAX((CASE
+                    WHEN (`bl`.`location_type` = 'ShippingAddress') THEN `bl`.`city_name`
+                END)), MAX(`bl`.`city_name`)) AS `location`,
+                COALESCE(MAX((CASE
+                    WHEN (`bl`.`location_type` = 'ShippingAddress') THEN `bl`.`street_address_1`
+                END)), MAX(`bl`.`street_address_1`)) AS `street_address1`,
+                COALESCE(MAX((CASE
+                    WHEN (`bl`.`location_type` = 'ShippingAddress') THEN `bl`.`state_name`
+                END)), MAX(`bl`.`state_name`)) AS `state`
+        FROM
+            `alpide-sales`.`bo_location_sales_invoice` `bl`
+        GROUP BY `bl`.`invoice_master_id` , `bl`.`rid`) `loc_info` ON (((`loc_info`.`invoice_master_id` = `inv`.`invoice_master_id`)
+            AND (`loc_info`.`rid` = `inv`.`rid`))))
+        WHERE
+            ((LOWER(`inv`.`status`) <> 'void')
+                AND (`inv`.`status` IS NOT NULL))) `base`
+        LEFT JOIN (SELECT 
+            `i`.`sku` AS `sku`,
+                GROUP_CONCAT(DISTINCT `cat`.`category_name`
+                    ORDER BY `cat`.`category_name` ASC
+                    SEPARATOR '_') AS `category`
+        FROM
+            ((`alpide-inventory`.`inventory_item` `i`
+        LEFT JOIN `alpide-inventory`.`inventory_item_category_ref` `cref` ON ((`i`.`item_id` = `cref`.`item_id`)))
+        LEFT JOIN `alpide-inventory`.`inventory_item_category` `cat` ON ((`cref`.`inventory_item_category_id` = `cat`.`inventory_item_category_id`)))
+        GROUP BY `i`.`sku`) `cat_info` ON ((`base`.`sku` = `cat_info`.`sku`)))
+    GROUP BY `base`.`rid` , `base`.`year` , `base`.`month` , `base`.`sku` , `base`.`ean` , `base`.`brand` , COALESCE(`base`.`street_address1`, '');
