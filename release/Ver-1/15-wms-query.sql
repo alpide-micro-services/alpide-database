@@ -355,3 +355,5 @@ VIEW `alpide-purchase`.`return_report_vm` AS
     WHERE
         (`dm`.`is_update_inventory` = 1)
     GROUP BY `dm`.`debit_memo_number` , `itm`.`sku` , `dm`.`rid` , `year` , `month` , `itm`.`ean` , `br`.`brand_name` , `itm`.`description` , `dt`.`quantity`;
+
+
