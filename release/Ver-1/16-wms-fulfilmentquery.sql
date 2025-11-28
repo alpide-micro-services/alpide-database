@@ -221,3 +221,9 @@ END$$
 DELIMITER ;
 ;
 
+ALTER TABLE `alpide-purchase`.`packing_unit_putaway_ref` 
+CHANGE COLUMN `storage_type_id` `storage_type_id` BIGINT NULL ;
+
+
+ALTER TABLE `alpide-crm`.`crm_lead` 
+ADD COLUMN `last_note` VARCHAR(45) NULL AFTER `stage_status_name`;
