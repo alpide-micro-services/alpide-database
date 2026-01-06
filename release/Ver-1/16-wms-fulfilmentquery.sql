@@ -226,6 +226,36 @@ CHANGE COLUMN `storage_type_id` `storage_type_id` BIGINT NULL ;
 
 
 ALTER TABLE `alpide-crm`.`crm_lead` 
+CHANGE COLUMN `last_note` `last_note` VARCHAR(1000) NULL DEFAULT NULL ;
+
+
+ALTER TABLE `alpide-purchase`.`supplier_inbound_delivery_packing_unit_ref_child` 
+ADD COLUMN `package_name` VARCHAR(255) NULL DEFAULT NULL AFTER `storage_type_id`;
+
+ALTER TABLE `alpide-inventory`.`inventory_item_variant_stock` 
+ADD COLUMN `batch_id` BIGINT NULL AFTER `receiving_bin_id`;
+
+
+-- Create stock_movement table
+CREATE TABLE `alpide-inventory`.stock_movement (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    date_time DATETIME NOT NULL,
+    rid BIGINT,
+    variant_id BIGINT,
+    master_id BIGINT,
+    detail_id BIGINT,
+    txn_detail VARCHAR(1000),
+    txn_name VARCHAR(255),
+    batch_id BIGINT,
+    bin_id BIGINT,
+    bin_action VARCHAR(50),
+    stock_id BIGINT,
+    quantity INT,
+    case_description VARCHAR(500),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+ALTER TABLE `alpide-crm`.`crm_lead` 
 ADD COLUMN `last_note` VARCHAR(45) NULL AFTER `stage_status_name`;
 
 ALTER TABLE `alpide-users`.`pos_user` 
