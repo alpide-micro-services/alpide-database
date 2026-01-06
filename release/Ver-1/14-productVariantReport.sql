@@ -122,8 +122,7 @@ VIEW `alpide-purchase`.`grn_report_vm` AS
 
 USE `alpide-sales`;
 CREATE  OR REPLACE 
-    ALGORITHM = UNDEFINED 
-    DEFINER = `root`@`localhost` 
+    ALGORITHM = UNDEFINED
     SQL SECURITY DEFINER
 VIEW `alpide-sales`.`sales_vs_purchase_report_vw` AS
     SELECT 
