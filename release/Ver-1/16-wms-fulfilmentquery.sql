@@ -265,10 +265,10 @@ ADD COLUMN `created_by_user_id` BIGINT NULL AFTER `updated_at`;
 
 
 ALTER TABLE `alpide-inventory`.inventory_item 
-ADD COLUMN customer_id BIGINT DEFAULT null;
+ADD COLUMN customer_id BIGINT DEFAULT 0;
 
 ALTER TABLE `alpide-inventory`.inventory_item 
-ADD COLUMN is_seller_inventory BIGINT DEFAULT null;
+ADD COLUMN is_seller_inventory BIGINT DEFAULT 0;
 
 Use `alpide-sales`;
 ALTER TABLE customers 
