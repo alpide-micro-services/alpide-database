@@ -686,3 +686,4 @@ LEFT JOIN (
     AND inv.rid = c.rid
 
 WHERE c.is_seller = 1;
+
