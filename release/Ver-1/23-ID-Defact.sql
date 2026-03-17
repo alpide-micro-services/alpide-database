@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `supplier_inbound_delivery_defect_master` (
     `total_defect_qty` DOUBLE NOT NULL DEFAULT 0 COMMENT 'Total quantity of defective items',
     `total_defect_amount` DOUBLE NOT NULL DEFAULT 0 COMMENT 'Total monetary value of defects',
     `remarks` TEXT DEFAULT NULL COMMENT 'Additional notes or comments',
-    `date_created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Record creation timestamp',
+    `date_created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Record creation timestamp',
     `date_updated` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last update timestamp',
     `created_by_user_id` BIGINT DEFAULT NULL COMMENT 'User ID who created the record',
     `updated_by_user_id` BIGINT DEFAULT NULL COMMENT 'User ID who last updated the record',
