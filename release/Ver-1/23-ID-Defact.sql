@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `supplier_inbound_delivery_defect_master` (
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS `supplier_inbound_delivery_defect_details` (
-                                                                          `defect_details_id` BIGINT DEFAULT NULL AUTO_INCREMENT COMMENT 'Primary key for defect detail line',
+                                                                          `defect_details_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Primary key for defect detail line',
                                                                           `version` INT DEFAULT NULL DEFAULT 0 COMMENT 'Optimistic locking version field',
                                                                           `defect_master_id` BIGINT DEFAULT NULL COMMENT 'Foreign key to defect master',
                                                                           `rid` BIGINT DEFAULT NULL COMMENT 'Relationship ID - must match master record',
