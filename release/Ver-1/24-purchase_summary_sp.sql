@@ -219,3 +219,8 @@ EXECUTE stmt2;
 DEALLOCATE PREPARE stmt2;
 END$$
 DELIMITER ;
+
+
+
+ALTER TABLE `alpide-inventory`.`inventory_item_variant_stock`
+    ADD COLUMN qty_defect DOUBLE DEFAULT 0 ;
