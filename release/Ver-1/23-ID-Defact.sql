@@ -3,33 +3,35 @@ USE `alpide-purchase`;
 
 
 
-CREATE TABLE IF NOT EXISTS `supplier_inbound_delivery_defect_master` (
-                                                                         `defect_master_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Primary key for defect master record',
-                                                                         `version` INT NOT NULL DEFAULT 0 COMMENT 'Optimistic locking version field',
-                                                                         `defect_number` VARCHAR(50) DEFAULT NULL COMMENT 'Human-readable defect number (e.g., DEF-2024-001)',
-    `rid` BIGINT NOT NULL COMMENT 'Relationship ID - tenant/organization identifier',
-    `supplier_id` BIGINT DEFAULT NULL COMMENT 'Foreign key to supplier master',
-    `inbound_delivery_master_id` BIGINT DEFAULT NULL COMMENT 'Foreign key to GRN master record',
-    `po_master_id` BIGINT DEFAULT NULL COMMENT 'Foreign key to Purchase Order master',
-    `created_by_emp_id` BIGINT DEFAULT NULL COMMENT 'Employee ID who created the defect record',
-    `defect_date` TIMESTAMP NULL DEFAULT NULL COMMENT 'Date when defect was identified',
-    `status` VARCHAR(50) DEFAULT NULL COMMENT 'System status (e.g., DEFECT_RECORDED)',
-    `status_color` VARCHAR(20) DEFAULT NULL COMMENT 'Color code for system status display',
-    `user_status` VARCHAR(100) DEFAULT NULL COMMENT 'User-defined custom status',
-    `user_status_color` VARCHAR(20) DEFAULT NULL COMMENT 'Color code for user status display',
-    `defect_reason` TEXT DEFAULT NULL COMMENT 'Reason for the defect (e.g., Damaged, Wrong Item)',
-    `defect_action` VARCHAR(100) DEFAULT NULL COMMENT 'Action to be taken (e.g., Return, Replace, Credit)',
-    `total_defect_qty` DOUBLE NOT NULL DEFAULT 0 COMMENT 'Total quantity of defective items',
-    `total_defect_amount` DOUBLE NOT NULL DEFAULT 0 COMMENT 'Total monetary value of defects',
-    `remarks` TEXT DEFAULT NULL COMMENT 'Additional notes or comments',
-    `date_created` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Record creation timestamp',
-    `date_updated` TIMESTAMP  DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Last update timestamp',
-    `created_by_user_id` BIGINT DEFAULT NULL COMMENT 'User ID who created the record',
-    `updated_by_user_id` BIGINT DEFAULT NULL COMMENT 'User ID who last updated the record',
 
-    PRIMARY KEY (`defect_master_id`),
 
-    -- Indexes for performance optimization
+
+CREATE TABLE IF NOT EXISTS supplier_inbound_delivery_defect_master (
+                                                                       defect_master_id        BIGINT          NOT NULL AUTO_INCREMENT,
+                                                                       version                 INT             NOT NULL DEFAULT 0,
+                                                                       defect_number           VARCHAR(50)     NULL,
+    rid                     BIGINT          NOT NULL,
+    supplier_id             BIGINT          NULL,
+    inbound_delivery_master_id BIGINT       NULL,
+    po_master_id            BIGINT          NULL,
+    created_by_emp_id       BIGINT          NULL,
+    defect_date             DATETIME        NULL,
+    status                  VARCHAR(50)     NULL,
+    status_color            VARCHAR(20)     NULL,
+    user_status             VARCHAR(50)     NULL,
+    user_status_color       VARCHAR(20)     NULL,
+    defect_reason           VARCHAR(500)    NULL,
+    defect_action           VARCHAR(500)    NULL,
+    total_defect_qty        DOUBLE          DEFAULT 0,
+    total_defect_amount     DOUBLE          DEFAULT 0,
+    remarks                 VARCHAR(1000)   NULL,
+    created_by_user_id      BIGINT          NULL,
+    updated_by_user_id      BIGINT          NULL,
+    date_created            DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    date_updated            DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (defect_master_id)
+
+    KEY idx_defect_details_master (defect_master_id, rid)
     INDEX `idx_defect_master_rid` (`defect_master_id`, `rid`) COMMENT 'Composite index for FK reference from details table',
     INDEX `idx_rid_supplier` (`rid`, `supplier_id`) COMMENT 'Composite index for tenant and supplier queries',
     INDEX `idx_inbound_delivery` (`inbound_delivery_master_id`) COMMENT 'Index for GRN lookup',
@@ -37,9 +39,48 @@ CREATE TABLE IF NOT EXISTS `supplier_inbound_delivery_defect_master` (
     INDEX `idx_defect_number` (`defect_number`) COMMENT 'Index for defect number search',
     INDEX `idx_defect_date` (`defect_date`) COMMENT 'Index for date range queries',
     INDEX `idx_status` (`status`) COMMENT 'Index for status filtering'
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- 2. supplier_inbound_delivery_defect_details
+--    (line items per defect master — one row per item/variant)
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS supplier_inbound_delivery_defect_details (
+                                                                        defect_details_id           BIGINT          NOT NULL AUTO_INCREMENT,
+                                                                        version                     INT             NOT NULL DEFAULT 0,
+                                                                        defect_master_id            BIGINT          NOT NULL,
+                                                                        rid                         BIGINT          NOT NULL,
+                                                                        inbound_delivery_details_id BIGINT          NULL,
+                                                                        item_id                     BIGINT          NULL,
+                                                                        item_variant_id             BIGINT          NULL,
+                                                                        sku                         VARCHAR(100)    NULL,
+    attribute_value1            VARCHAR(100)    NULL,
+    attribute_value2            VARCHAR(100)    NULL,
+    attribute_value3            VARCHAR(100)    NULL,
+    attribute_id1               BIGINT          NULL,
+    attribute_id2               BIGINT          NULL,
+    attribute_id3               BIGINT          NULL,
+    qty_defect                  DOUBLE          DEFAULT 0,
+    qty_from_grn                DOUBLE          DEFAULT 0,
+    purchase_price              DOUBLE          DEFAULT 0,
+    defect_amount               DOUBLE          DEFAULT 0,
+    is_variant                  TINYINT         DEFAULT 0,
+    defect_type                 VARCHAR(100)    NULL,
+    defect_description          VARCHAR(1000)   NULL,
+    date_created                DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (defect_details_id),
+
+    -- Indexes for performance
+    INDEX `idx_defect_master` (`defect_master_id`, `rid`) COMMENT 'Composite index for master lookup',
+    INDEX `idx_inbound_delivery_details` (`inbound_delivery_details_id`) COMMENT 'Index for GRN detail lookup',
+    INDEX `idx_item` (`item_id`) COMMENT 'Index for item queries',
+    INDEX `idx_item_variant` (`item_variant_id`) COMMENT 'Index for variant queries',
+    INDEX `idx_sku` (`sku`) COMMENT 'Index for SKU search'
 
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-    COMMENT='Master table for GRN defect records';
+    COMMENT='Detail lines for defect records - individual defective items';
+
+
 
 
 -- ============================================================================
@@ -303,3 +344,100 @@ END$$
 
 DELIMITER ;
 
+
+
+-- -----------------------------------------------------------------------------
+-- 3. defect_disposition
+--    (one record per disposition action: scrap | rework | debit_memo)
+--    Multiple dispositions can exist per defect master (partial qty support)
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS defect_disposition (
+                                                  disposition_id          BIGINT          NOT NULL AUTO_INCREMENT,
+                                                  version                 INT             NOT NULL DEFAULT 0,
+                                                  rid                     BIGINT          NOT NULL,
+                                                  defect_master_id        BIGINT          NOT NULL,
+                                                  supplier_id             BIGINT          NULL,
+                                                  disposition_type        VARCHAR(50)     NOT NULL COMMENT 'scrap | rework | debit_memo',
+    disposition_number      VARCHAR(50)     NULL,
+    total_qty               DOUBLE          DEFAULT 0,
+    total_amount            DOUBLE          DEFAULT 0,
+    debit_memo_master_id    BIGINT          NULL COMMENT 'populated when disposition_type = debit_memo',
+    remarks                 VARCHAR(1000)   NULL,
+    status                  VARCHAR(50)     NULL,
+    status_color            VARCHAR(20)     NULL,
+    created_by_user_id      BIGINT          NULL,
+    disposition_date        DATETIME        NULL,
+    date_created            DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    date_updated            DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (disposition_id),
+    KEY idx_disposition_defect (defect_master_id, rid),
+    KEY idx_disposition_type (rid, disposition_type)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- 4. defect_disposition_details
+--    (line items per disposition — tracks partial qty per defect detail line)
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS defect_disposition_details (
+                                                          disposition_details_id  BIGINT          NOT NULL AUTO_INCREMENT,
+                                                          version                 INT             NOT NULL DEFAULT 0,
+                                                          disposition_id          BIGINT          NOT NULL,
+                                                          rid                     BIGINT          NOT NULL,
+                                                          defect_details_id       BIGINT          NULL COMMENT 'ref to original defect detail line',
+                                                          item_id                 BIGINT          NULL,
+                                                          item_variant_id         BIGINT          NULL,
+                                                          sku                     VARCHAR(100)    NULL,
+    attribute_value1        VARCHAR(100)    NULL,
+    attribute_value2        VARCHAR(100)    NULL,
+    attribute_value3        VARCHAR(100)    NULL,
+    attribute_id1           BIGINT          NULL,
+    attribute_id2           BIGINT          NULL,
+    attribute_id3           BIGINT          NULL,
+    qty_disposition         DOUBLE          DEFAULT 0,
+    purchase_price          DOUBLE          DEFAULT 0,
+    disposition_amount      DOUBLE          DEFAULT 0,
+    is_variant              TINYINT         DEFAULT 0,
+    date_created            DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (disposition_details_id),
+    KEY idx_disp_details_disposition (disposition_id, rid),
+    KEY idx_disp_details_defect (defect_details_id, rid)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -----------------------------------------------------------------------------
+-- 5. supplier_coa_tx_defect_disposition
+--    (COA / ledger entries for defect transactions)
+--    Used at 4 levels:
+--      - defect master     (defect_master_id set, others null)
+--      - defect details    (defect_details_id set, others null)
+--      - disposition master (disposition_id set, disposition_details_id null)
+--      - disposition detail (disposition_id + disposition_details_id both set)
+-- -----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS supplier_coa_tx_defect_disposition (
+                                                                  coa_tx_disposition_id   BIGINT          NOT NULL AUTO_INCREMENT,
+                                                                  version                 INT             NOT NULL DEFAULT 0,
+                                                                  rid                     BIGINT          NOT NULL,
+                                                                  disposition_id          BIGINT          NULL,
+                                                                  disposition_details_id  BIGINT          NULL,
+                                                                  defect_master_id        BIGINT          NULL,
+                                                                  defect_details_id       BIGINT          NULL,
+                                                                  supplier_id             BIGINT          NULL,
+                                                                  tx_type                 VARCHAR(50)     NULL COMMENT 'scrap | rework | debit_memo | defect_record',
+    disposition_number      VARCHAR(50)     NULL,
+    ledger_account_id       BIGINT          NULL,
+    accounting_entry        VARCHAR(5)      NULL COMMENT 'DR | CR',
+    amount                  DOUBLE          DEFAULT 0,
+    amount_percent          DOUBLE          DEFAULT 0,
+    tax_id                  BIGINT          NULL,
+    tax_name                VARCHAR(100)    NULL,
+    cost_center_id          BIGINT          NULL,
+    created_by              BIGINT          NULL,
+    tx_date                 DATETIME        NULL,
+    fy_start_date           DATETIME        NULL,
+    fy_end_date             DATETIME        NULL,
+    date_created            DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    date_updated            DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (coa_tx_disposition_id),
+    KEY idx_coa_defect_disposition (disposition_id, rid),
+    KEY idx_coa_defect_master (defect_master_id, rid),
+    KEY idx_coa_defect_details (defect_details_id, rid)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
