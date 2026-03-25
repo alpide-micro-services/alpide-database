@@ -381,7 +381,7 @@ CREATE TABLE IF NOT EXISTS defect_disposition (
 CREATE TABLE IF NOT EXISTS defect_disposition_details (
                                                           disposition_details_id  BIGINT          NOT NULL AUTO_INCREMENT,
                                                           version                 INT             NOT NULL DEFAULT 0,
-                                                          disposition_id          BIGINT          NOT NULL,
+                                                          disposition_id          BIGINT          ,
                                                           rid                     BIGINT          NOT NULL,
                                                           defect_details_id       BIGINT          NULL COMMENT 'ref to original defect detail line',
                                                           item_id                 BIGINT          NULL,
