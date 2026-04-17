@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS `alpide-sales`.customer_opening_balance (
     fy_end_date                 DATETIME,
     created_by_user_id          BIGINT,
     updated_by_user_id          BIGINT,
-    date_created                DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    date_updated                DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    date_created                DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    date_updated                DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (opening_balance_id),
 
@@ -60,8 +60,8 @@ CREATE TABLE IF NOT EXISTS `alpide-sales`.customer_coa_tx_opening_balance (
     currency_code       VARCHAR(10),
     exchange_rate       DECIMAL(19, 6)  DEFAULT 1,
     created_by          BIGINT,
-    date_created        DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    date_updated        DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    date_created        DATETIME        DEFAULT CURRENT_TIMESTAMP,
+    date_updated        DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
     PRIMARY KEY (ob_coa_tx_id),
 
