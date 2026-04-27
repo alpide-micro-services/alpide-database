@@ -73,7 +73,7 @@ CREATE TABLE `alpide-sales`.customer_advance_utilization (
                                                              advance_number          VARCHAR(100)    NULL,
 
                                                              created_by_user_id      BIGINT          NULL,
-                                                             date_created            DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                                             date_created            DATETIME        DEFAULT CURRENT_TIMESTAMP,
 
                                                              PRIMARY KEY (utilization_id),
                                                              INDEX idx_cau_advance       (advance_payment_id),
