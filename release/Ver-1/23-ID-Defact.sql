@@ -29,9 +29,9 @@ CREATE TABLE IF NOT EXISTS supplier_inbound_delivery_defect_master (
     updated_by_user_id      BIGINT          NULL,
     date_created            DATETIME        DEFAULT CURRENT_TIMESTAMP,
     date_updated            DATETIME        DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (defect_master_id)
+    PRIMARY KEY (defect_master_id),
 
-    KEY idx_defect_details_master (defect_master_id, rid)
+    KEY idx_defect_details_master (defect_master_id, rid),
     INDEX `idx_defect_master_rid` (`defect_master_id`, `rid`) COMMENT 'Composite index for FK reference from details table',
     INDEX `idx_rid_supplier` (`rid`, `supplier_id`) COMMENT 'Composite index for tenant and supplier queries',
     INDEX `idx_inbound_delivery` (`inbound_delivery_master_id`) COMMENT 'Index for GRN lookup',

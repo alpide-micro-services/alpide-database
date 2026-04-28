@@ -10,7 +10,7 @@ DROP procedure IF EXISTS `alpide-sales`.`get_sales_order_summary`;
 
 DELIMITER $$
 USE `alpide-sales`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `get_sales_order_summary`(
+CREATE PROCEDURE `get_sales_order_summary`(
     IN rid INT,
     IN customerId INT,
     IN soStatus VARCHAR(75),
