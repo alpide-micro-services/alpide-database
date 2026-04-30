@@ -803,3 +803,55 @@ END$$
 DELIMITER ;
 ;
 
+
+use `alpide-crm`;
+CREATE TABLE IF NOT EXISTS crm_lead_status_history (
+    id                  BIGINT          NOT NULL AUTO_INCREMENT,
+    rid                 BIGINT          NOT NULL COMMENT 'relationship id',
+    crm_lead_id         BIGINT          NOT NULL COMMENT 'FK → crm_lead.crm_lead_id',
+ 
+    -- "STATUS" or "STAGE_STATUS"
+    change_type         VARCHAR(20)     NOT NULL,
+ 
+    from_status_id      BIGINT          NULL     COMMENT 'NULL on first assignment',
+    from_status_name    VARCHAR(255)    NULL,
+    to_status_id        BIGINT          NOT NULL,
+    to_status_name      VARCHAR(255)    NOT NULL,
+ 
+    changed_by_emp_id   BIGINT          NOT NULL,
+    changed_by_emp_name VARCHAR(255)    NULL,
+    changed_at          TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ 
+    date_created        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ 
+    PRIMARY KEY (id),
+    INDEX idx_lead_history  (rid, crm_lead_id),
+    INDEX idx_changed_at    (changed_at),
+    INDEX idx_change_type   (rid, crm_lead_id, change_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Audit log: every status and stage-status change per lead';
+  
+  CREATE TABLE IF NOT EXISTS crm_lead_stage_status_parent (
+    id               BIGINT          NOT NULL AUTO_INCREMENT,
+    rid              BIGINT          NOT NULL COMMENT 'relationship id',
+    stage_status_id  BIGINT          NOT NULL COMMENT 'FK → crm_lead_stage_status.lead_status_id',
+    parent_status_id BIGINT          NOT NULL COMMENT 'FK → crm_lead_status.lead_status_id',
+ 
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_stage_parent (rid, stage_status_id, parent_status_id),
+    INDEX idx_by_parent  (rid, parent_status_id),
+    INDEX idx_by_stage   (rid, stage_status_id),
+ 
+    CONSTRAINT fk_ssp_stage
+        FOREIGN KEY (stage_status_id)
+        REFERENCES crm_lead_stage_status (lead_status_id)
+        ON DELETE CASCADE,
+ 
+    CONSTRAINT fk_ssp_parent
+        FOREIGN KEY (parent_status_id)
+        REFERENCES crm_lead_status (lead_status_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+  COMMENT='Many-to-many: stage status → parent status(es)';
+    ALTER TABLE crm_lead_status_history                                                                                                                                                                                                       
+  ADD COLUMN comment TEXT NULL AFTER changed_by_emp_name;  
