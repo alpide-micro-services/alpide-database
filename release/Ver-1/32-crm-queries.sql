@@ -593,7 +593,7 @@ INSERT IGNORE INTO crm_opportunity_status_stage_map (rid, status_id, stage_id) V
     (0, 18, 5), (0, 19, 5), (0, 20, 5), (0, 21, 5), (0, 22, 5);
     -- Cross-stage statuses (23,24,25) have no bridge rows — is_cross_stage flag handles them
     
-    CALL kill_idle_connections(300);
+   
 
 
 
