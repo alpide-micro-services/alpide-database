@@ -855,3 +855,7 @@ CREATE TABLE IF NOT EXISTS crm_lead_status_history (
   COMMENT='Many-to-many: stage status → parent status(es)';
     ALTER TABLE crm_lead_status_history                                                                                                                                                                                                       
   ADD COLUMN comment TEXT NULL AFTER changed_by_emp_name;  
+
+
+ALTER TABLE `alpide-inventory`.`inventory_item` 
+ADD COLUMN `is_active` INT NULL DEFAULT 1 AFTER `is_service_product`;
