@@ -11,3 +11,8 @@ ALTER TABLE `alpide-sales`.`customer_sales_quotation_master`
   ADD COLUMN `crm_lead_id`      BIGINT       NULL DEFAULT NULL,
   ADD COLUMN `lead_name`        VARCHAR(255) NULL DEFAULT NULL,
   ADD COLUMN `crm_account_id`   BIGINT       NULL DEFAULT NULL;
+
+
+
+  ALTER TABLE `alpide-crm`.`crm_scheduled_activity` 
+CHANGE COLUMN `activity_type` `activity_type` VARCHAR(255) NOT NULL ;
