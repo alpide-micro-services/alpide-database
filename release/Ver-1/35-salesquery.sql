@@ -16,3 +16,232 @@ ALTER TABLE `alpide-sales`.`customer_sales_quotation_master`
 
   ALTER TABLE `alpide-crm`.`crm_scheduled_activity` 
 CHANGE COLUMN `activity_type` `activity_type` VARCHAR(255) NOT NULL ;
+
+
+ALTER TABLE `alpide-crm`.`crm_scheduled_activity` 
+CHANGE COLUMN `entity_type` `entity_type` VARCHAR(255) NOT NULL ;
+ALTER TABLE `alpide-sales`.`customer_sales_quotation_master` 
+CHANGE COLUMN `remarks_internal` `remarks_internal` TEXT NULL DEFAULT NULL ,
+CHANGE COLUMN `remarks_customer` `remarks_customer` TEXT NULL DEFAULT NULL ;
+ALTER TABLE `alpide-sales`.`customer_sales_quotation_master` 
+CHANGE COLUMN `footer` `footer` TEXT NULL DEFAULT NULL ;
+
+
+ALTER TABLE `alpide-crm`.`crm_lead` 
+ADD COLUMN `company_name` varchar(255) NULL DEFAULT null ;
+
+
+USE `alpide-crm`;
+DROP procedure IF EXISTS `get_crm_leads_list`;
+
+USE `alpide-crm`;
+DROP procedure IF EXISTS `alpide-crm`.`get_crm_leads_list`;
+;
+
+DELIMITER $$
+USE `alpide-crm`$$
+CREATE  PROCEDURE `get_crm_leads_list`(
+    IN p_rid INT,
+    IN searchedStr VARCHAR(45),
+    IN projectName VARCHAR(45),
+    IN crmLeadFormSettingId INT,
+    IN leadAssignTo VARCHAR(255),
+    IN sourceName VARCHAR(45),
+    IN statusName VARCHAR(45),
+    IN startDate TIMESTAMP,
+    IN endDate TIMESTAMP,
+    IN reminderType VARCHAR(45),
+    IN pageNumber INT,
+    IN pageSize INT,
+    IN isActive INT,
+    IN stageStatusName VARCHAR(100),
+    IN startUpdateDate TIMESTAMP,
+    IN endUpdateDate TIMESTAMP
+)
+BEGIN
+    DECLARE whereClause TEXT;
+    DECLARE idList VARCHAR(255);
+
+    SET whereClause = CONCAT("cl.rid=", p_rid);
+    SET whereClause = CONCAT(whereClause, " AND cl.is_active='", isActive, "'");
+
+    IF (searchedStr IS NOT NULL) THEN
+        SET whereClause = CONCAT(whereClause, " AND cl.lead_name LIKE '%", searchedStr, "%'");
+        SET whereClause = CONCAT(whereClause, " OR ld.email LIKE '%", searchedStr, "%'");
+        SET whereClause = CONCAT(whereClause, " OR ld.mobile_no LIKE '%", searchedStr, "%'");
+    END IF;
+
+    IF (projectName IS NOT NULL) THEN
+        SET whereClause = CONCAT(whereClause, " AND pm.project_name='", projectName, "'");
+    END IF;
+
+    IF (crmLeadFormSettingId > 0) THEN
+        SET whereClause = CONCAT(whereClause, " AND cl.crm_lead_form_setting_id=", crmLeadFormSettingId);
+    END IF;
+
+    IF (leadAssignTo IS NOT NULL) THEN
+        DROP TEMPORARY TABLE IF EXISTS temp_ids;
+        CREATE TEMPORARY TABLE temp_ids (id INT);
+        SET idList = leadAssignTo;
+        WHILE LENGTH(idList) > 0 DO
+            SET @value = SUBSTRING_INDEX(idList, ',', 1);
+            INSERT INTO temp_ids (id) VALUES (CAST(@value AS UNSIGNED));
+            SET idList = TRIM(BOTH ',' FROM SUBSTRING(idList, LENGTH(@value) + 2));
+        END WHILE;
+        SET whereClause = CONCAT(whereClause, " AND clea.rel_employee_id IN (SELECT id FROM temp_ids)");
+    END IF;
+
+    IF (sourceName IS NOT NULL) THEN
+        SET whereClause = CONCAT(whereClause, " AND cl.lead_source_name='", sourceName, "'");
+    END IF;
+
+    IF (statusName IS NOT NULL) THEN
+        SET whereClause = CONCAT(whereClause, " AND cl.status_name='", statusName, "'");
+    END IF;
+
+    IF (stageStatusName IS NOT NULL) THEN
+        SET whereClause = CONCAT(whereClause, " AND cl.stage_status_name='", stageStatusName, "'");
+    END IF;
+
+    IF (reminderType IS NOT NULL AND reminderType = 'Upcoming') THEN
+        SET whereClause = CONCAT(whereClause, " AND clr.reminder_date_and_time >'", CURRENT_TIMESTAMP, "'");
+    END IF;
+
+    IF (reminderType IS NOT NULL AND reminderType = 'Expired') THEN
+        SET whereClause = CONCAT(whereClause, " AND clr.reminder_date_and_time <'", CURRENT_TIMESTAMP, "'");
+    END IF;
+
+    IF (startDate IS NOT NULL AND endDate IS NOT NULL) THEN
+        SET whereClause = CONCAT(whereClause, " AND cl.date_created BETWEEN '", startDate, "' AND '", endDate, "'");
+    END IF;
+
+    IF (startUpdateDate IS NOT NULL AND endUpdateDate IS NOT NULL) THEN
+        SET whereClause = CONCAT(whereClause, " AND cl.date_updated BETWEEN '", startUpdateDate, "' AND '", endUpdateDate, "'");
+    END IF;
+
+    SET @stmt = 'SELECT
+        DISTINCT cl.crm_lead_id                    AS crmLeadId,
+        cl.rid                                     AS relationshipId,
+        cl.lead_name                               AS leadName,
+        cl.is_active                               AS isActive,
+        cl.industry_code                           AS industryCode,
+        cl.industry_name                           AS industryName,
+        cl.company_type_code                       AS companyTypeCode,
+        cl.company_type_name                       AS companyTypeName,
+        cl.website                                 AS website,
+        cl.lead_source_name                        AS leadSourceName,
+        cl.is_existing_lead                        AS isExistingLead,
+        cl.has_lead_contacted                      AS hasLeadContacted,
+        cl.status_name                             AS statusName,
+        cl.has_proposal_sent                       AS hasProposalSent,
+        cl.remarks                                 AS remarks,
+        cl.lead_source_id                          AS leadSourceId,
+        cl.date_created                            AS dateCreated,
+        cl.date_updated                            AS dateUpdated,
+        cl.created_by                              AS createdBy,
+        cl.updated_by                              AS updatedBy,
+        cl.status_color_for_ui_cell                AS statusColorForUiCell,
+        cl.status_id                               AS statusId,
+        cl.star_rating                             AS starRating,
+        cl.created_by_emp_id                       AS createdByEmpId,
+        cl.updated_by_emp_id                       AS updatedByEmpId,
+        cl.form_name                               AS formName,
+        cl.crm_lead_form_setting_id                AS crmLeadFormSettingId,
+        cl.is_lead_to_customer                     AS isLeadToCustomer,
+        clr.reminder_title                         AS reminderTitle,
+        ld.full_name                               AS fullName,
+        ld.email                                   AS email,
+        ld.mobile_no                               AS mobileNo,
+        COALESCE(cln.notesCount, 0)                AS totalNotes,
+        cl.stage_status_name                       AS stageStatusName,
+
+        /* ── NEW: Next scheduled activity ───────────────────────────── */
+        nxa.title                                  AS nextActivityTitle,
+        nxa.activity_type                          AS nextActivityType,
+        nxa.scheduled_at                           AS nextActivityScheduledAt,
+        nxa.assigned_to_emp_name                   AS nextActivityAssignedTo,
+
+        /* ── NEW: BANT score (0-5) ──────────────────────────────────── */
+        COALESCE(bant.score, 0)                    AS bantScore,
+
+        /* ── NEW: Lead score (Hot/Warm/Cold) ────────────────────────── */
+        COALESCE(cl.lead_score, ''Cold'')           AS leadScore,
+
+        /* ── NEW: Conversion fields ─────────────────────────────────── */
+        cl.is_converted                            AS isConverted,
+        cl.converted_at                            AS convertedAt,
+        cl.company_name                            AS companyName
+
+        FROM crm_lead cl
+        LEFT JOIN crm_lead_reminder clr
+            ON cl.crm_lead_id = clr.crm_lead_id
+        LEFT JOIN (
+            SELECT crm_lead_id, COUNT(*) AS notesCount
+            FROM crm_lead_notes
+            GROUP BY crm_lead_id
+        ) cln ON cl.crm_lead_id = cln.crm_lead_id
+        LEFT JOIN crm_lead_emp_assigned clea
+            ON cl.crm_lead_id = clea.crm_lead_id
+        LEFT JOIN crm_lead_form_setting clfs
+            ON cl.crm_lead_form_setting_id = clfs.crm_lead_form_setting_id
+        LEFT JOIN (
+            SELECT crm_lead_id,
+                MAX(CASE WHEN label = "Full Name"  THEN value END) AS full_name,
+                MAX(CASE WHEN label = "Email"      THEN value END) AS email,
+                MAX(CASE WHEN label = "Mobile No." THEN value END) AS mobile_no
+            FROM crm_lead_detail
+            GROUP BY crm_lead_id
+        ) ld ON cl.crm_lead_id = ld.crm_lead_id
+
+        /* ── Next upcoming scheduled activity per lead ──────────────── */
+        LEFT JOIN (
+            SELECT sa.entity_id,
+                   sa.title,
+                   sa.activity_type,
+                   sa.scheduled_at,
+                   sa.assigned_to_emp_name
+            FROM crm_scheduled_activity sa
+            INNER JOIN (
+                SELECT entity_id, MIN(scheduled_at) AS min_scheduled_at
+                FROM crm_scheduled_activity
+                WHERE entity_type = ''LEAD''
+                  AND status = ''SCHEDULED''
+                  AND scheduled_at > NOW()
+                GROUP BY entity_id
+            ) nxt ON sa.entity_id = nxt.entity_id
+                  AND sa.scheduled_at = nxt.min_scheduled_at
+                  AND sa.entity_type = ''LEAD''
+        ) nxa ON cl.crm_lead_id = nxa.entity_id
+
+        /* ── BANT record ────────────────────────────────────────────── */
+        LEFT JOIN crm_lead_bant bant
+            ON cl.crm_lead_id = bant.crm_lead_id
+
+        WHERE ';
+
+    SET @stmt1 = CONCAT(
+        @stmt,
+        whereClause,
+        ' ORDER BY cl.date_updated DESC LIMIT ',
+        pageSize,
+        ' OFFSET ',
+        pageNumber * pageSize
+    );
+
+    PREPARE stmt2 FROM @stmt1;
+    EXECUTE stmt2;
+    DEALLOCATE PREPARE stmt2;
+    DROP TEMPORARY TABLE IF EXISTS temp_ids;
+
+END$$
+
+DELIMITER ;
+;
+
+ALTER TABLE `alpide-crm`.`crm_opportunity_stage_history` 
+CHANGE COLUMN `to_stage_id` `to_stage_id` INT NULL ,
+CHANGE COLUMN `to_stage_name` `to_stage_name` VARCHAR(100) NULL ,
+CHANGE COLUMN `to_status_id` `to_status_id` INT NULL ,
+CHANGE COLUMN `to_status_name` `to_status_name` VARCHAR(100) NULL ,
+CHANGE COLUMN `is_reason_mandatory` `is_reason_mandatory` TINYINT(1) NULL DEFAULT '0' ,
+CHANGE COLUMN `changed_by_emp_id` `changed_by_emp_id` BIGINT NULL ;
