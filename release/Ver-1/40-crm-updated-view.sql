@@ -7,7 +7,7 @@ DROP procedure IF EXISTS `alpide-crm`.`get_crm_leads_list`;
 
 DELIMITER $$
 USE `alpide-crm`$$
-CREATE  PROCEDURE `get_crm_leads_list`(
+CREATE DEFINER=`alpide`@`%` PROCEDURE `get_crm_leads_list`(
     IN p_rid INT,
     IN searchedStr VARCHAR(45),
     IN projectName VARCHAR(45),
@@ -147,7 +147,8 @@ BEGIN
         /* ── NEW: Conversion fields ─────────────────────────────────── */
         cl.is_converted                            AS isConverted,
         cl.converted_at                            AS convertedAt,
-        cl.company_name                            AS companyName
+        cl.company_name                            AS companyName,
+        cl.competitor                              AS competitor
 
         FROM crm_lead cl
         LEFT JOIN crm_lead_reminder clr
@@ -161,7 +162,7 @@ BEGIN
             ON cl.crm_lead_id = clea.crm_lead_id
         LEFT JOIN crm_lead_form_setting clfs
             ON cl.crm_lead_form_setting_id = clfs.crm_lead_form_setting_id
-        LEFT JOIN (
+        LEFT JOIN ( 
             SELECT crm_lead_id,
                 MAX(CASE WHEN label = "Full Name"  THEN value END) AS full_name,
                 MAX(CASE WHEN label = "Email"      THEN value END) AS email,
