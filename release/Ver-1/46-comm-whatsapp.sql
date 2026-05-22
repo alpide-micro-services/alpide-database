@@ -1,5 +1,5 @@
 
-  CREATE TABLE IF NOT EXISTS whatsapp_setting (
+  CREATE TABLE IF NOT EXISTS `alpide-communication`.whatsapp_setting (
       whatsapp_setting_id   BIGINT         AUTO_INCREMENT PRIMARY KEY,
       rid                   BIGINT         NOT NULL,
       provider              VARCHAR(50)    DEFAULT 'META',
@@ -19,7 +19,7 @@
       INDEX idx_wa_setting_rid_provider (rid, provider)
   );
 
-  CREATE TABLE IF NOT EXISTS whatsapp_communication_log (
+  CREATE TABLE IF NOT EXISTS `alpide-communication`.whatsapp_communication_log (
       whatsapp_communication_log_id  BIGINT        AUTO_INCREMENT PRIMARY KEY,
       rid                            BIGINT        NOT NULL,
       module_type                    VARCHAR(50)   NOT NULL,
