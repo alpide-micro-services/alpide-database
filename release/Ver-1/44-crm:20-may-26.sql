@@ -1,4 +1,5 @@
-  CREATE TABLE crm_manual_communication_log (
+USE `alpide-crm`;
+CREATE TABLE crm_manual_communication_log (
       crm_manual_comm_log_id  BIGINT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
       rid                     BIGINT          NOT NULL,
       crm_lead_id             BIGINT          DEFAULT NULL,
