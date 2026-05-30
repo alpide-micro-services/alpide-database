@@ -187,6 +187,11 @@ ALTER TABLE `alpide-accounting`.`coa_ledger_account_group`
 ALTER TABLE `alpide-accounting`.`coa_ledger_account`
     ADD COLUMN `country_id` BIGINT NULL DEFAULT '0';
 
+ALTER TABLE `alpide-accounting`.`coa_ledger_account`
+    CHANGE COLUMN `tax_single_rate_id` `tax_single_rate_id` BIGINT NULL DEFAULT '0' ,
+    CHANGE COLUMN `tax_single_rate_percent` `tax_single_rate_percent` INT NULL DEFAULT '0' ;
+
+
 
 ALTER TABLE `alpide-accounting`.coa_category_group MODIFY COLUMN version int DEFAULT 0 NOT NULL;
 
@@ -358,6 +363,17 @@ ALTER TABLE `alpide-accounting`.coa_ledger_account_ref MODIFY COLUMN version int
 insert into `alpide-accounting`.`coa_ledger_account_ref` (coa_ledger_account_id, rid) select ledger_account_id, rid from coa_ledger_account;
 
 -- US Ledger book setup End
+
+
+
+INSERT INTO `alpide-accounting`.coa_ledger_account
+(ledger_account_name, ledger_account_group_id, coa_category_id, coa_category_group_id, account_number, accounting_entry, rid, in_built, country_id)
+VALUES ('Opening Balance Adjustment', 13, 1, 2, 1011, 'Credit', 0, 1, 0);
+
+
+INSERT INTO `alpide-accounting`.coa_ledger_account
+(ledger_account_name, ledger_account_group_id, coa_category_id, coa_category_group_id, account_number, accounting_entry, rid, in_built, country_id)
+VALUES ('Opening Balance Adjustment', 63, 21, 6, 1011, 'Credit', 0, 1, 103);
 
 
 INSERT INTO `alpide-accounting`.`finance_gst_goods_rates` (`finance_gst_goods_rates`, `hsn_code`, `description_of_goods`, `cgst_rate`, `sgst_utgst_rate`, `igst_rate`, `cess`, `heading`, `type`, `service_condition`) VALUES (1, '0202', 'All goods [other than fresh or chilled], and put up in unit container and,- (a) bearing a registered brand name; or (b) bearing a brand name on which an actionable claim or enforceable right in a court of law is available [other than those where any actionable claim or enforceable right in respect of such brand name has been foregone voluntarily], subject to the conditions as in the ANNEXURE]', 2.5, 2.5, 5, '�', NULL, 'Goods', NULL);
