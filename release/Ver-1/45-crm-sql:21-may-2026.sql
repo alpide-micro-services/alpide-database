@@ -7,7 +7,7 @@ DROP procedure IF EXISTS `alpide-crm`.`get_crm_leads_list`;
 
 DELIMITER $$
 USE `alpide-crm`$$
-CREATE DEFINER=`alpide`@`%` PROCEDURE `get_crm_leads_list`(
+CREATE PROCEDURE `get_crm_leads_list`(
         IN p_rid              INT,
         IN searchedStr        VARCHAR(45),
         IN projectName        VARCHAR(45),
