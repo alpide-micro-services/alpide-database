@@ -70,3 +70,8 @@ USE `alpide-crm`;
 ALTER TABLE crm_meeting
 ADD COLUMN company_name     VARCHAR(255),
 ADD COLUMN description   VARCHAR(100);
+
+USE `alpide-crm`;
+ALTER TABLE crm_google_calendar_connection 
+MODIFY COLUMN client_id VARCHAR(255) NULL,
+MODIFY COLUMN client_secret VARCHAR(255) NULL;
