@@ -19,3 +19,6 @@
                         ALTER TABLE `alpide-crm`.`crm_workflow_master`
       ADD COLUMN  `source_id`   INT          NOT NULL DEFAULT 0,
       ADD COLUMN  `source_name` VARCHAR(255) NULL;
+
+              ALTER TABLE `alpide-crm`.crm_manual_communication_log
+       ADD COLUMN date_updated TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP;
